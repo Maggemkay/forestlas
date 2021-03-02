@@ -3,7 +3,7 @@ import multiprocessing
 import numpy as np
 
 ### from forestlas.lasStructure import *
-from lasStructure import *
+from .lasStructure import *
 
 class lasIO:
 
@@ -94,7 +94,7 @@ class lasIO:
         #self.tempDirectory = os.path.join(tempfile.gettempdir(), tempDirectoryName)
         #os.makedirs(self.tempDirectory)
 
-        if self.verbose:    print "temporary directory at: {}".format(self.tempDirectory)
+        if self.verbose:    print("temporary directory at: {}".format(self.tempDirectory))
 
         # create output directory
         if not out:
@@ -142,7 +142,7 @@ class lasIO:
         self.x_centre = np.mean([self.globalHeader["xmax"], self.globalHeader["xmin"]])
         self.y_centre = np.mean([self.globalHeader["ymax"], self.globalHeader["ymin"]])
 
-        if self.verbose:    print "number of tiles to process: {}".format(self.numberTiles)
+        if self.verbose:    print("number of tiles to process: {}".format(self.numberTiles))
         self.area = (self.globalHeader["xmax"] - self.globalHeader["xmin"]) * (self.globalHeader["ymax"] - self.globalHeader["ymin"])
         # self.pointDensity = self.globalHeader["numptrecords"] / self.area
 
@@ -161,7 +161,7 @@ class lasIO:
         the PATH to be in the system environment variables
         """
 
-        print "converting to .las: {}".format(os.path.abspath(tile))
+        print ("converting to .las: {}".format(os.path.abspath(tile)))
         os.chdir(self.dir)
         tileName = os.path.splitext(os.path.split(tile)[1])[0] + ".las"
         tempFile = os.path.join(self.tempDirectory, tileName)
@@ -226,9 +226,9 @@ class lasIO:
                                               "lastTouched": None
                                              }
 
-        keys = np.array(self.xy_dictionary.keys(), dtype=[('x', int), ('y', int)])
+        keys = np.array(list(self.xy_dictionary.keys()), dtype=[('x', int), ('y', int)])
 
-        if self.verbose:    print "number of plots: {}".format(len(self.xy_dictionary))
+        if self.verbose:    print("number of plots: {}".format(len(self.xy_dictionary)))
 
         for tile in self.tileList:
 
@@ -244,7 +244,7 @@ class lasIO:
             if takeSample:
                 sample = self.generateSample(takeSample)
                 if self.verbose:
-                    print "random sample produced: {}".format(len(sample))
+                    print("random sample produced: {}".format(len(sample)))
             else:
                 sample = range(self.h['numptrecords'])
 
@@ -256,7 +256,7 @@ class lasIO:
                 for i in sample: # loops through all points
 
                     if i%self.counter == 0 and self.verbose:
-                        print "{}% | {} of {} points selected | {}".format(np.round((np.float(self.totPoints)/self.globalHeader['numptrecords'])*100), numPoints, self.globalHeader['numptrecords'], datetime.datetime.now())
+                        print("{}% | {} of {} points selected | {}".format(np.round((np.float(self.totPoints)/self.globalHeader['numptrecords'])*100), numPoints, self.globalHeader['numptrecords'], datetime.datetime.now()))
 
                     fh.seek(self.h["offset"] + (numPoints * self.h['pointreclen'])) # searches to beginning of point
 
@@ -288,7 +288,7 @@ class lasIO:
             if self.xy_dictionary[key]["isOpen"] is not False:
                 self.xy_dictionary[key]["isOpen"].close()
 
-        if self.verbose :    print "number of bad points = {}".format(self.badPoints)
+        if self.verbose :    print("number of bad points = {}".format(self.badPoints))
         if self.znr :
             self.ptFrmt, self.dt = znrStruct()
             self.globalHeader["pointreclen"] = 5
@@ -351,7 +351,7 @@ class lasIO:
             if takeSample:
                 sample = self.generateSample(takeSample)
                 if self.verbose :
-                    print "random sample produced: {}".format(len(sample))
+                    print("random sample produced: {}".format(len(sample)))
             else:
                 sample = range(self.h['numptrecords'])
 
@@ -371,10 +371,29 @@ class lasIO:
                     fh.seek(self.h["offset"] + (numPoints * self.h['pointreclen'])) # searches to beginning of point
 
                     try:
-                        point_dictionary = extract_return(self, fh)
+                        #print("Testing here!!!!!!") #REMOVE
+                        
+                        # point_dictionary is a point with all associated data to that point.
+                        #print(fh) #REMOVE
+                        #print("#############FILE HEAD#################") #REMOVE
+                        
+                        point_dictionary = extract_return(self, fh) 
+                        
+                        #print(point_dictionary) #REMOVE
+                        #print("#####################################") #REMOVE
 
                         if self.znr is False:
+                            
+                            #print("We get here?") #REMOVE
+                            
+                            #print(self.xy_dictionary["all"]) #REMOVE
+                            #print("############xy_dictionary['all']###########") #REMOVE
+                            
                             self.xy_dictionary["all"] = self.writePoint(self.xy_dictionary["all"], point_dictionary)
+                            
+                            #print("WE WROTE POINTS!!!!!!!!!!") #REMOVE
+                            #print()
+                            
                             # populates number of returns
                             if point_dictionary["rtn_num"] < 6 and point_dictionary["rtn_num"] > 0:
                                 self.xy_dictionary["all"]["num_rtn"][point_dictionary["rtn_num"]] += 1
@@ -386,13 +405,18 @@ class lasIO:
                         self.totPoints += 1
                     except:
                         self.badPoints += 1
+                        #break #REMOVE
                         continue
+                        
+                        
+                    #break #REMOVE
+                #break #REMOVE
 
         for key in self.xy_dictionary.keys():
             if self.xy_dictionary[key]["isOpen"] is not False:
                 self.xy_dictionary[key]["isOpen"].close()
 
-        if self.verbose :    print "number of bad points: {}".format(self.badPoints)
+        if self.verbose :    print ("number of bad points: {}".format(self.badPoints))
         if self.znr :
             self.ptFrmt, self.dt = znrStruct()
             self.globalHeader["pointreclen"] = 5
@@ -538,7 +562,7 @@ class lasIO:
         if self.xy_dictionary["plot"]["isOpen"]:
             self.xy_dictionary["plot"]["isOpen"].close()
 
-        if self.verbose :    print "number of bad points = {}".format(self.badPoints)
+        if self.verbose :    print ("number of bad points = {}".format(self.badPoints))
         if self.znr :
             self.ptFrmt, self.dt = znrStruct()
             self.globalHeader["pointreclen"] = 5
@@ -595,8 +619,8 @@ class lasIO:
         ymax = grid['y'].max() + (resolution / 2.)
 
         if self.verbose:
-            print 'grid resolution:', resolution
-            print 'aiming to produce {} tiles'.format(len(grid))
+            print ('grid resolution:', resolution)
+            print ('aiming to produce {} tiles'.format(len(grid)))
 
         self.xy_dictionary = {}
         for x, y in grid:
@@ -704,7 +728,7 @@ class lasIO:
             if self.xy_dictionary[key]["isOpen"] is not False:
                 self.xy_dictionary[key]["isOpen"].close()
 
-        if self.verbose :    print "number of bad points = {}".format(self.badPoints)
+        if self.verbose :    print ("number of bad points = {}".format(self.badPoints))
         if self.znr :
             self.ptFrmt, self.dt = znrStruct()
             self.globalHeader["pointreclen"] = 5
@@ -716,6 +740,11 @@ class lasIO:
         return self
 
     def writePoint(self, tile, d):
+        
+        #print(tile) #REMOVE
+        #print("###############TILE#################") #REMOVE
+        #print(d) #REMOVE
+        #print("################D####################") #REMOVE
 
         # opens file for writing points to
 
@@ -723,29 +752,67 @@ class lasIO:
             tile["isOpen"] = open(tile["tempFile"], "ab")
             self.filesOpen += 1
 
+        #print("Can we open writing files?") #REMOVE
+        
         # writes point
         for i in self.ptFrmt:
+            
+            #print(self.ptFrmt) #REMOVE
+            #print("#####################################") #REMOVE
+            #print(i) #REMOVE
+            #print(i[2]) #REMOVE
+            #print("#####################################") #REMOVE
+            
+            #print("Can we get one") #REMOVE
+            
             if i[0] == 'return_grp':
                 byte = ((d['scan_edge'] & 1) << 7) | ((d['scan_dir'] & 1) << 6) | ((d['rtn_tot'] & 7) << 3) | (d['rtn_num'] & 7)
+                #print("Can we get two one?") #REMOVE
             elif i[0] == 'x':
-                byte = (d['x'] - self.h['xoffset']) / self.h['xscale']
+                byte = int((d['x'] - self.h['xoffset']) / self.h['xscale'])
+                #print("Can we get two two?") #REMOVE
             elif i[0] == 'y':
-                byte = (d['y'] - self.h['yoffset']) / self.h['yscale']
+                byte = int((d['y'] - self.h['yoffset']) / self.h['yscale'])
+                #print("Can we get two three?") #REMOVE
             elif i[0] == 'z':
-                byte = (d['z'] - self.h['zoffset']) / self.h['zscale']
+                byte = int((d['z'] - self.h['zoffset']) / self.h['zscale'])
+                #print("Can we get two four?") #REMOVE
             else:
                 byte = d[i[0]]
+                #print("Can we get two five?") #REMOVE
+                
+            #print("### byte ###")
+            #print(byte)
+            #print(int(byte))
+            #print(type(byte))
+            #print(type(1.234))
+            #print("###")
+            #print("Can we get two?") #REMOVE
+        
+        
+            #a = struct.pack('=' + i[2], byte)#.encode('f')
+            #print("a works?")
+            #print(a)
+            #print("Crash?")
 
-            tile["isOpen"].write(struct.pack('=' + i[2], byte))
+            tile["isOpen"].write(struct.pack('=' + i[2], byte))#.encode('f'))
 
+            #print("Can we get three?") #REMOVE
+        
+        #print("Can we get four?") #REMOVE
+        
         # updates header information
         if d['z'] > tile["zmax"]:
             tile["zmax"] = d['z']
         if d['z'] < tile["zmin"]:
             tile["zmin"] = d['z']
         tile["i"] += 1
+        
+        #print("Can we get five?") #REMOVE
 
         tile["lastTouched"] = datetime.datetime.now()
+        
+        #print("The end?") #REMOVE
 
         return tile
 
@@ -862,7 +929,7 @@ class lasIO:
                 tileCount += 1
 
             if i%nTileCounter == 0 and i > 0 and self.verbose:
-                print "{:.0f}% | {} of {} tiles exported | {}".format( np.float(i) / len(self.xy_dictionary) * 100, i, len(self.xy_dictionary), datetime.datetime.now())
+                print ("{:.0f}% | {} of {} tiles exported | {}".format( np.float(i) / len(self.xy_dictionary) * 100, i, len(self.xy_dictionary), datetime.datetime.now()))
 
             tile = self.xy_dictionary[key]
             self.h['gensoftware'] = 'CRC207 LiDAR analysis software  '
@@ -918,16 +985,16 @@ class lasIO:
             if self.keepTemp is False:  os.unlink(tile["tempFile"])
 
         if tileCount > 0:
-            print "100% | {} of {} tiles exported | {}".format(len(self.xy_dictionary),
+            print ("100% | {} of {} tiles exported | {}".format(len(self.xy_dictionary),
                                                                len(self.xy_dictionary),
-                                                               datetime.datetime.now())
+                                                               datetime.datetime.now()))
 
             if len(self.xy_dictionary) == 1:
-                print ".las file written to {}".format(outFile)
+                print (".las file written to {}".format(outFile))
             else:
-                print ".las file(s) written to {}".format(os.path.split(outFile)[0])
+                print (".las file(s) written to {}".format(os.path.split(outFile)[0]))
         else:
-            print "! no tiles to export !"
+            print ("! no tiles to export !")
 
         if not self.keepTemp:  shutil.rmtree(self.tempDirectory)
 
@@ -953,7 +1020,7 @@ class lasIO:
                 continue
 
             if i%nTileCounter == 0:
-                print "{}% | {} of {} tiles exported | {}".format(np.round((i/np.float(len(self.xy_dictionary)))*100), i, len(self.xy_dictionary), datetime.datetime.now())
+                print ("{}% | {} of {} tiles exported | {}".format(np.round((i/np.float(len(self.xy_dictionary)))*100), i, len(self.xy_dictionary), datetime.datetime.now()))
 
             tile = self.xy_dictionary[key]
             self.h['filesig'] = "ZNRF"
@@ -996,7 +1063,7 @@ class lasIO:
             tile["isOpen"] = "written_to"
             if self.keepTemp is False:  os.unlink(tile["tempFile"])
 
-        if self.verbose :    print ".znr file written to {}".format(os.path.split(outFile)[0])
+        if self.verbose :    print (".znr file written to {}".format(os.path.split(outFile)[0]))
 
         if self.keepTemp is False:  shutil.rmtree(self.tempDirectory)
 
@@ -1067,7 +1134,7 @@ class lasIO:
                         byte = d[i[0]]
                     out.write(struct.pack('=' + i[2], byte))
 
-        if self.verbose: print ".las file written to {}".format(outFile)
+        if self.verbose: print (".las file written to {}".format(outFile))
 
         if self.keepTemp is False:  shutil.rmtree(self.tempDirectory)
 
@@ -1088,9 +1155,9 @@ class lasIO:
                 del self.xy_dictionary[key]
                 continue
 
-            print len(self.xy_dictionary)
+            print (len(self.xy_dictionary))
             if i%nTileCounter == 0:
-                print "{}% | {} of {} tiles exported | {}".format(np.round((i/np.float(len(self.xy_dictionary)))*100), i, len(self.xy_dictionary), datetime.datetime.now())
+                print ("{}% | {} of {} tiles exported | {}".format(np.round((i/np.float(len(self.xy_dictionary)))*100), i, len(self.xy_dictionary), datetime.datetime.now()))
 
             tile = self.xy_dictionary[key]
             self.h['filesig'] = "ZNRF"
@@ -1130,11 +1197,11 @@ class lasIO:
             if self.keepTemp is False:  os.unlink(tile["tempFile"])
 
         if len(self.xy_dictionary) == 0:
-            print "No tiles written"
+            print ("No tiles written")
         elif len(self.xy_dictionary) == 1:
-            print ".znr file written to {}".format(tile["outFile"])
+            print (".znr file written to {}".format(tile["outFile"]))
         else:
-            if self.verbose :    print ".znr files written to {}".format(os.path.split(outFile)[0])
+            if self.verbose :    print (".znr files written to {}".format(os.path.split(outFile)[0]))
             if self.keepTemp is False:  shutil.rmtree(self.tempDirectory)
 
         if self.keepTemp is False:  shutil.rmtree(self.tempDirectory)
@@ -1170,7 +1237,7 @@ class lasIO:
                                                a['rtn_num'], \
                                                a['rtn_tot']]), \
                                                fmt='%.1f', delimiter=',')
-            if self.verbose: print '.txt saved to:', savePath
+            if self.verbose: print ('.txt saved to:', savePath)
             if self.keepTemp is False:  os.unlink(tile["tempFile"])
 
         if self.keepTemp is False:  shutil.rmtree(self.tempDirectory)
@@ -1196,7 +1263,7 @@ class lasIO:
 
         if self.keepTemp is False:  shutil.rmtree(self.tempDirectory)
 
-        if self.verbose: print 'XYZ saved to:', self.savePath
+        if self.verbose: print ('XYZ saved to:', self.savePath)
 
         return self
 
@@ -1215,7 +1282,7 @@ class lasIO:
 
     def printProgress(self):
 
-        print "{}% | {} of {} points processed | {}".format(np.round((np.float(self.totPoints)/self.globalHeader['numptrecords'])*100), self.totPoints, self.globalHeader['numptrecords'], datetime.datetime.now())
+        print ("{}% | {} of {} points processed | {}".format(np.round((np.float(self.totPoints)/self.globalHeader['numptrecords'])*100), self.totPoints, self.globalHeader['numptrecords'], datetime.datetime.now()))
 
     def generateSample(self, sample):
 
@@ -1230,7 +1297,7 @@ class lasIO:
                 os.unlink(os.path.join(self.tempDirectory, file))
 
         shutil.rmtree(self.tempDirectory)
-        if self.verbose: print "{} has been deleted".format(self.tempDirectory)
+        if self.verbose: print ("{} has been deleted".format(self.tempDirectory))
 
 
 def parseHeader(filename):
@@ -1274,10 +1341,10 @@ def extract_return(self, fh):
     else: ptFrmt = self.ptFrmt
 
     point_dictionary = {} # dictionary for storing values in for each point
-
+    
     for ent in ptFrmt:
         byte = fh.read(ent[1])
-        val = struct.unpack('=' + ent[2] , byte)[0]
+        val = struct.unpack('=' + ent[2] , byte)[0]        
         if ent[0] == 'x':
             val = (val * self.h['xscale'] ) + self.h['xoffset']
         if ent[0] == 'y':
@@ -1294,7 +1361,7 @@ def extract_return(self, fh):
             continue # required so that 'return_grp' is not added to dictionary
 
         point_dictionary[ent[0]] = val
-
+        
     if point_dictionary["z"] > 1000000:
         raise NameError("z very high: {}".format(point_dictionary["z"]))
 
@@ -1333,9 +1400,9 @@ def round_plot(point, plot_x, plot_y, xmax, xmin, ymax, ymin, r):
 
 
 def getPtFrmt(globalHeader, verbose=False):
-
+    
     # return structure
-    if "txt2las" in globalHeader["gensoftware"]:
+    if "txt2las" in str(globalHeader["gensoftware"]):
         ptFrmt, dt = point_fmtLTstruct()
     elif globalHeader["pointformat"] == 0:
         ptFrmt, dt = point_fmt0struct()
@@ -1348,7 +1415,7 @@ def getPtFrmt(globalHeader, verbose=False):
 
 
 def getVLR(headerSize, las):
-        fh = open(os.path.join(las))
+        fh = open(os.path.join(las), encoding='Latin-1')
         fh.seek(headerSize)
         vlr = fh.read(86)
         fh.close()

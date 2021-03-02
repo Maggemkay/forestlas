@@ -57,7 +57,7 @@ def point_fmt0struct():
              ('scan_ang', np.int), 
              ('user_data', np.int), 
              ('point_src_id', np.int)]))
-            
+
 def point_fmt1struct():
     return ((('x', 4,'l',1),
              ('y', 4,'l',1),
@@ -83,6 +83,32 @@ def point_fmt1struct():
              ('user_data', np.int),
              ('point_src_id', np.int),
              ('gps_time', np.float)]))
+
+#def point_fmt1struct():
+#    return ((('x', 4,'l',1),
+#             ('y', 4,'l',1),
+#             ('z', 4,'l',1),
+#             ('i', 2,'H',1),
+#             ('return_grp', 1,'B',1),
+#             ('class', 1,'B',1),
+#             ('scan_ang', 1,'b',1),
+#             ('user_data', 1,'B',1),
+#             ('point_src_id', 2,'H',1),
+#             ('gps_time', 8,'d',1)), 
+#             
+#             np.dtype([('x', np.float),
+#             ('y', np.float), 
+#             ('z', np.float), 
+#             ('i', np.int), 
+#             ('rtn_num', np.int),
+#             ('rtn_tot', np.int),
+#             ('scan_dir', np.int),
+#             ('scan_edge', np.int),
+#             ('class', np.int),
+#             ('scan_ang', np.int),
+#             ('user_data', np.int),
+#             ('point_src_id', np.int),
+#             ('gps_time', np.float)]))
    
 def point_fmt3struct():
      return ((('x', 4,'l',1),
