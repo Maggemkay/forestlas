@@ -57,8 +57,8 @@ class CanopyComplexity:
         
         # removes ground and outliers
         idx = [(self.z > threshold) & (self.z < np.percentile(self.z, top_threshold))]
-        self.z = self.z[idx] # ...from z
-        self.zw = rtn_weight[idx] # ... and from weighted heights
+        self.z = self.z[tuple(idx)] # ...from z
+        self.zw = rtn_weight[tuple(idx)] # ... and from weighted heights
         self._create_bins()
 
         return self
@@ -85,7 +85,7 @@ class CanopyComplexity:
                 self.pgap = np.zeros(self.bins) # array for populating with pgap
                 for (i, height_below_toc) in enumerate(self.zxOrig):
                     idx = [self.z >= height_below_toc] # index all rows >= height z
-                    weight_of_returns_above_z = sum(self.zw[idx]) # calculates sum of weighted returns above height z
+                    weight_of_returns_above_z = sum(self.zw[tuple(idx)]) # calculates sum of weighted returns above height z
                     self.pgap[i] = 1. - (weight_of_returns_above_z / self.total) # populates pgap with proportion of weight
             else:
                 #calculateFreqPgap
@@ -193,12 +193,17 @@ class CanopyComplexity:
             # selects returns with heights in bin h
             self.returnWeight[h] = {} # creates dictionary within self.returnWeight to store count of NoR values
             idx = [(self.z > h) & (self.z <= h + 1)]
-            NoR = self.zw[idx] # total number of returns for returns in range h to h+1
+            NoR = self.zw[tuple(idx)] # total number of returns for returns in range h to h+1
             for rtn in np.unique(NoR):
                 self.returnWeight[h][rtn] = len(NoR[NoR == rtn]) # counts number of returns by rtn_tot
             sumNoR = np.sum(self.returnWeight[h].values()) # counts number of returns in bin
             for rtn in self.returnWeight[h].keys(): # return values in height bin
                 # self.returnWeight[h][rtn] = self.returnWeight[h][rtn] / np.float(sumNoR) # calculates weight
+                print(type(sumNoR))
+                print(sumNoR)
+                print(type(self.returnWeight[h][rtn]))
+                print(type(np.float(sumNoR)))
+                print(np.float(sumNoR))
                 self.returnWeight[h][rtn] /= np.float(sumNoR)
 
         # Simulated height
@@ -245,7 +250,7 @@ class bootstrapComplexity:
         
     def chp(self, las):
     
-        if self.verbose: print 'processing:', las
+        if self.verbose: print('processing:', las)
 
         pid = multiprocessing.current_process()._identity[0]
         tempDirectoryName = "lidar.processing." + str(np.random.mtrand.RandomState(pid).randint(0, 9999999)) + ".tmp"
@@ -305,6 +310,6 @@ if __name__ == '__main__':
     # las = CanopyComplexity().fromSample(las['z'], las['rtn_tot']).CHP('model')
     las = CanopyComplexity().fromLAS(las).CHP('model')
     chp = CanopyComplexity().fromLAS(las.simulateCloud()).CHP()
-    print chp.zw
+    print(chp.zw)
 
     
