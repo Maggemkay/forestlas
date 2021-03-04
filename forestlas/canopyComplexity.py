@@ -196,14 +196,9 @@ class CanopyComplexity:
             NoR = self.zw[tuple(idx)] # total number of returns for returns in range h to h+1
             for rtn in np.unique(NoR):
                 self.returnWeight[h][rtn] = len(NoR[NoR == rtn]) # counts number of returns by rtn_tot
-            sumNoR = np.sum(self.returnWeight[h].values()) # counts number of returns in bin
+            sumNoR = np.sum(list(self.returnWeight[h].values())) # counts number of returns in bin
             for rtn in self.returnWeight[h].keys(): # return values in height bin
-                # self.returnWeight[h][rtn] = self.returnWeight[h][rtn] / np.float(sumNoR) # calculates weight
-                print(type(sumNoR))
-                print(sumNoR)
-                print(type(self.returnWeight[h][rtn]))
-                print(type(np.float(sumNoR)))
-                print(np.float(sumNoR))
+                # self.returnWeight[h][rtn] = self.returnWeight[h][rtn] / np.float(sumNoR) # calculates weight                
                 self.returnWeight[h][rtn] /= np.float(sumNoR)
 
         # Simulated height
@@ -249,7 +244,7 @@ class bootstrapComplexity:
         self.mp(processes)
         
     def chp(self, las):
-    
+        
         if self.verbose: print('processing:', las)
 
         pid = multiprocessing.current_process()._identity[0]
@@ -262,12 +257,12 @@ class bootstrapComplexity:
 
         for i in range(self.N):
     
-            z = self.chp.simulateCloud()
+            currentPlot = self.chp.simulateCloud()
 
-            if z['z'].max() < 2 or len(z) < 2 or 0 in z['rtn_tot']:
+            if currentPlot['z'].max() < 2 or len(currentPlot) < 2 or 0 in currentPlot['rtn_tot']:
                 self.bsCHP[i] = 0
             else:
-                sample = CanopyComplexity().fromLAS(z).CHP()
+                sample = CanopyComplexity().fromLAS(currentPlot).CHP()
                 self.bsCHP[i] = sample.layerCount
         
         if type(las) is str: plotName = os.path.split(os.path.splitext(las)[0])[1]
@@ -281,7 +276,7 @@ class bootstrapComplexity:
         manager = multiprocessing.Manager()
         self.chp_dictionary = manager.dict()
 
-        for i in range((len(self.l) / maxProcess) + 1):
+        for i in range(int((len(self.l) / maxProcess) + 1)):
         
             jobs = []
     
