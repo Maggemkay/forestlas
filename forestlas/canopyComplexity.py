@@ -267,6 +267,7 @@ class bootstrapComplexity:
         
         if type(las) is str: plotName = os.path.split(os.path.splitext(las)[0])[1]
         else: plotName = 'array'
+        #self.chp_dictionary[plotName] = self.bsCHP #THIS IS BACKUP // MARCUS
         self.chp_dictionary[plotName] = self.bsCHP
         return self
   
