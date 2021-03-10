@@ -68,7 +68,8 @@ class CanopyComplexity:
         # create bin array
         #### required because of numpy float issue ###
         factor = 1 / self.z_scale
-        z_min, z_max = self.threshold * factor, int((self.z.max() + (self.z_scale*1000)) * factor)
+        z_min = self.threshold * factor
+        z_max = int((self.z.max() + (self.z_scale*1000)) * factor)
         ##############################################
         self.bins = int(z_max-(z_min-1)) # number of bins
         self.zxOrig = np.linspace(z_min, z_max, self.bins) / factor # "x-axis"
@@ -267,7 +268,6 @@ class bootstrapComplexity:
         
         if type(las) is str: plotName = os.path.split(os.path.splitext(las)[0])[1]
         else: plotName = 'array'
-        #self.chp_dictionary[plotName] = self.bsCHP #THIS IS BACKUP // MARCUS
         self.chp_dictionary[plotName] = self.bsCHP
         return self
   

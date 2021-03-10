@@ -1,6 +1,12 @@
 # Custom ignores
 SLU_laserdata/
 
+# Stuff for azure
+.ipynb_aml_checkpoints/ 
+*.amltmp 
+*.amltemp
+.amlignore
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
